@@ -21,15 +21,9 @@
         <javafx.maven.plugin.version>0.0.6</javafx.maven.plugin.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-
     </properties>
 
     <dependencies>
-        <!-- Note that the dependencies here include some more dependencies
-             than are necessary right now; dependencies that might need to
-             be included later in the course of the project are added
-             already now, just to avoid missing these later. This applies
-             for example to mysql, gson, guava, ...  -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -75,13 +69,6 @@
     </dependencies>
 
     <build>
-        <!-- we use default maven directory structure as indicated below
-        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/resources</directory>
-            </resource>
-        </resources> -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -134,11 +121,14 @@
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>${javafx.maven.plugin.version}</version>
-                <configuration>
-                    <jlinkImageName>roborally</jlinkImageName>
-                    <launcher>launcher</launcher>
-                    <mainClass>roborally/org.openjfx.App</mainClass>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-cli</id>
+                        <configuration>
+                            <mainClass>dk.dtu.compute.se.pisd.roborally.RoboRally</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
