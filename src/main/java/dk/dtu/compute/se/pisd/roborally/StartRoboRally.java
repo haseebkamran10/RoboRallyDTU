@@ -21,6 +21,12 @@
  */
 package dk.dtu.compute.se.pisd.roborally;
 
+import javafx.application.Application;
+import javafx.scene.Parent;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
 /**
  * This is a class for starting up the RoboRally application. This is a
  * workaround for a strange quirk in the Open JavaFX project launcher,
@@ -30,10 +36,19 @@ package dk.dtu.compute.se.pisd.roborally;
  *
  * @author Ekkart Kindler, ekki@dtu.dk
  */
-public class StartRoboRally {
 
-    public static void main(String[] args) {
-        RoboRally.main(args);
+public class StartRoboRally extends Application {
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("/dk/dtu/compute/se/pisd/roborally/welcome.fxml"));
+        primaryStage.setTitle("RoboRally Welcome");
+        primaryStage.setScene(new Scene(root, 600, 400));
+        primaryStage.show();
     }
 
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
+
