@@ -13,11 +13,11 @@
             <TextField fx:id="nicknameField" />
             <Label text="Select number of players" style="-fx-font-size: 14;" />
             <HBox alignment="CENTER" spacing="10">
-                <RadioButton text="2" toggleGroup="$playersGroup"/>
-                <RadioButton text="3" toggleGroup="$playersGroup"/>
-                <RadioButton text="4" toggleGroup="$playersGroup"/>
-                <RadioButton text="5" toggleGroup="$playersGroup"/>
-                <RadioButton text="6" toggleGroup="$playersGroup"/>
+                <RadioButton text="2" toggleGroup="$playersGroup" style="-fx-text-fill: white;"/>
+                <RadioButton text="3" toggleGroup="$playersGroup" style="-fx-text-fill: white;"/>
+                <RadioButton text="4" toggleGroup="$playersGroup" style="-fx-text-fill: white;"/>
+                <RadioButton text="5" toggleGroup="$playersGroup" style="-fx-text-fill: white;"/>
+                <RadioButton text="6" toggleGroup="$playersGroup" style="-fx-text-fill: white;"/>
             </HBox>
             <Label text="Select Map" style="-fx-font-size: 14;" />
             <HBox alignment="CENTER" spacing="10">
@@ -25,19 +25,19 @@
                     <ImageView fitHeight="100" fitWidth="100">
                         <Image url="@course1.png"/>
                     </ImageView>
-                    <RadioButton text="Course 1" toggleGroup="$mapGroup"/>
+                    <RadioButton text="Course 1" toggleGroup="$mapGroup" style="-fx-text-fill: white;"/>
                 </VBox>
                 <VBox>
                     <ImageView fitHeight="100" fitWidth="100">
                         <Image url="@course2.png"/>
                     </ImageView>
-                    <RadioButton text="Course 2" toggleGroup="$mapGroup"/>
+                    <RadioButton text="Course 2" toggleGroup="$mapGroup" style="-fx-text-fill: white;"/>
                 </VBox>
                 <VBox>
                     <ImageView fitHeight="100" fitWidth="100">
                         <Image url="@course3.png"/>
                     </ImageView>
-                    <RadioButton text="Course 3" toggleGroup="$mapGroup"/>
+                    <RadioButton text="Course 3" toggleGroup="$mapGroup" style="-fx-text-fill: white;"/>
                 </VBox>
             </HBox>
         </VBox>

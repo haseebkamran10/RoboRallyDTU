@@ -4,37 +4,37 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import javafx.scene.control.Button;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class WelcomeController {
-
-    private static final Logger LOGGER = Logger.getLogger(WelcomeController.class.getName());
 
     @FXML
     private Button hostButton;
 
     @FXML
-    private Button joinButton;
-
-    @FXML
     private void handleHostGame() {
         try {
-            LOGGER.info("Host Game button clicked");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dk/dtu/compute/se/pisd/roborally/host.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+
+            // Apply CSS file
+            scene.getStylesheets().add(getClass().getResource("/dk/dtu/compute/se/pisd/roborally/styles.css").toExternalForm());
+
+            // Assuming you have a reference to the current stage
             Stage stage = (Stage) hostButton.getScene().getWindow();
-            Parent root = FXMLLoader.load(getClass().getResource("/dk/dtu/compute/se/pisd/roborally/host.fxml"));
-            stage.setScene(new Scene(root, 600, 400));
+            stage.setScene(scene);
+            stage.show();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load host.fxml", e);
+            e.printStackTrace();
         }
     }
 
     @FXML
     private void handleJoinGame() {
-        // Implement the logic for joining a game
+        // Logic for Join Game button
     }
 }

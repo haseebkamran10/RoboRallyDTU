@@ -13,6 +13,7 @@ dk\dtu\compute\se\pisd\roborally\fileaccess\model\SpaceTemplate.class
 dk\dtu\compute\se\pisd\roborally\controller\AppController.class
 dk\dtu\compute\se\pisd\roborally\controller\GameController$ImpossibleMoveException.class
 dk\dtu\compute\se\pisd\roborally\model\Phase.class
+dk\dtu\compute\se\pisd\roborally\controller\LoadingController.class
 dk\dtu\compute\se\pisd\roborally\view\PlayersView.class
 dk\dtu\compute\se\pisd\roborally\controller\FieldAction.class
 dk\dtu\compute\se\pisd\roborally\view\CardFieldView$OnDragDetectedHandler.class
