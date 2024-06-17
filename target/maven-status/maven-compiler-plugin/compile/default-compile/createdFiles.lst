@@ -23,6 +23,7 @@ dk\dtu\compute\se\pisd\roborally\view\ViewObserver.class
 dk\dtu\compute\se\pisd\roborally\view\CardFieldView$OnDragExitedHandler.class
 dk\dtu\compute\se\pisd\roborally\view\PlayerView.class
 dk\dtu\compute\se\pisd\roborally\fileaccess\IOUtil$1.class
+module-info.class
 dk\dtu\compute\se\pisd\roborally\view\RoboRallyMenuBar.class
 dk\dtu\compute\se\pisd\roborally\view\SpaceView.class
 dk\dtu\compute\se\pisd\roborally\model\Command.class
