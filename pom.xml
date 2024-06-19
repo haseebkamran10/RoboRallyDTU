@@ -126,17 +126,11 @@
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>${javafx.maven.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>default-cli</id>
-                        <configuration>
-                            <mainClass>dk.dtu.compute.se.pisd.roborally.StartRoboRally</mainClass>
-                            <options>
-                                <option>-p dk.dtu.compute.se.pisd.roborally</option>
-                            </options>
-                        </configuration>
-                    </execution>
-                </executions>
+                <configuration>
+                    <jlinkImageName>roborally</jlinkImageName>
+                    <launcher>launcher</launcher>
+                    <mainClass>dk.dtu.compute.se.pisd.roborally.RoboRally</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
