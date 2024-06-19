@@ -32,6 +32,12 @@ package dk.dtu.compute.se.pisd.roborally;
  */
 public class StartRoboRally {
 
+    /**
+     * The main entry point for the application. It calls the main method of the
+     * {@link RoboRally} class, effectively starting the game.
+     * @param args Command line arguments passed to the application. These are
+     * forwarded to the {@code RoboRally.main} method.
+     */
     public static void main(String[] args) {
         RoboRally.main(args);
     }

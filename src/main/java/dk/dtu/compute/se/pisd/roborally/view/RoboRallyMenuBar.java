@@ -27,10 +27,11 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 
 /**
- * ...
- *
+ * Represents the menu bar for the RoboRally game, providing a user interface
+ * for initiating key game actions such as starting a new game, saving/loading
+ * a game, stopping the ongoing game, and exiting the application. The menu bar
+ * integrates directly with the application controller to execute these actions.
  * @author Ekkart Kindler, ekki@dtu.dk
- *
  */
 public class RoboRallyMenuBar extends MenuBar {
 
@@ -48,6 +49,10 @@ public class RoboRallyMenuBar extends MenuBar {
 
     private MenuItem exitApp;
 
+    /**
+     * Constructs a RoboRallyMenuBar with associated game control actions.
+     * @param appController The application controller that handles game actions.
+     */
     public RoboRallyMenuBar(AppController appController) {
         this.appController = appController;
 
@@ -79,6 +84,10 @@ public class RoboRallyMenuBar extends MenuBar {
         update();
     }
 
+    /**
+     * Updates the visibility of menu items based on the game's state, such as
+     * enabling or disabling options based on whether a game is currently running.
+     */
     public void update() {
         if (appController.isGameRunning()) {
             newGame.setVisible(false);

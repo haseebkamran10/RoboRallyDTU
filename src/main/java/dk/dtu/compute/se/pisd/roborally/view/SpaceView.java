@@ -22,35 +22,40 @@
 package dk.dtu.compute.se.pisd.roborally.view;
 
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
-import dk.dtu.compute.se.pisd.roborally.model.Heading;
+import dk.dtu.compute.se.pisd.roborally.model.Board;
+import dk.dtu.compute.se.pisd.roborally.model.Phase;
 import dk.dtu.compute.se.pisd.roborally.model.Player;
 import dk.dtu.compute.se.pisd.roborally.model.Space;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.StrokeLineCap;
 import org.jetbrains.annotations.NotNull;
+import javafx.scene.image.Image;
+import java.io.InputStream;
 
 /**
- * ...
- *
+ * Represents the graphical view of a single space on the RoboRally game board. This class
+ * extends StackPane and is responsible for displaying the space's state, including any
+ * player present on the space. It listens for updates to its associated space and updates
+ * the display accordingly.
  * @author Ekkart Kindler, ekki@dtu.dk
- *
  */
 public class SpaceView extends StackPane implements ViewObserver {
 
-    final public static int SPACE_HEIGHT = 60; // 75;
-    final public static int SPACE_WIDTH = 60; // 75;
+    final public static int SPACE_HEIGHT = 50; // 60; // 75;
+    final public static int SPACE_WIDTH = 50;  // 60; // 75;
 
     public final Space space;
 
+    public ImageView image;
 
-    public SpaceView(@NotNull Space space) {
+    /**
+     * Constructs a SpaceView for the specified Space.
+     * @param space The space model to be represented by this view.
+     */
+    public SpaceView(@NotNull Space space, Board board) {
         this.space = space;
 
-        // XXX the following styling should better be done with styles
+
         this.setPrefWidth(SPACE_WIDTH);
         this.setMinWidth(SPACE_WIDTH);
         this.setMaxWidth(SPACE_WIDTH);
@@ -59,11 +64,10 @@ public class SpaceView extends StackPane implements ViewObserver {
         this.setMinHeight(SPACE_HEIGHT);
         this.setMaxHeight(SPACE_HEIGHT);
 
-        if ((space.x + space.y) % 2 == 0) {
-            this.setStyle("-fx-background-color: white;");
-        } else {
-            this.setStyle("-fx-background-color: black;");
-        }
+        image = new ImageView(this.space.image);
+        image.setFitWidth(50); // Set the width to 200 pixels
+        image.setFitHeight(50);
+        this.getChildren().add(image);
 
         // updatePlayer();
 
@@ -72,30 +76,55 @@ public class SpaceView extends StackPane implements ViewObserver {
         update(space);
     }
 
+    // Ændring af polygon/trekant figur til en avatar karakter
     private void updatePlayer() {
         this.getChildren().clear();
-
         Player player = space.getPlayer();
+        this.getChildren().add(image);
         if (player != null) {
-            Polygon arrow = new Polygon(0.0, 0.0,
-                    10.0, 20.0,
-                    20.0, 0.0 );
-            try {
-                arrow.setFill(Color.valueOf(player.getColor()));
-            } catch (Exception e) {
-                arrow.setFill(Color.MEDIUMPURPLE);
+            String color = player.getColor().toLowerCase();
+            String playerImageFile = "/robot-" + color + ".png";
+            InputStream imageStream = getClass().getResourceAsStream(playerImageFile);
+            if (imageStream == null) {
+                System.out.println("Image file not found: " + playerImageFile);
+                return;
             }
+            ImageView playerImage = new ImageView(new Image(imageStream));
+            playerImage.setFitWidth(55);
+            playerImage.setFitHeight(55);
 
-            arrow.setRotate((90*player.getHeading().ordinal())%360);
-            this.getChildren().add(arrow);
+            playerImage.setRotate(switch (player.getHeading()) {
+                case NORTH -> 0;
+                case EAST -> 90;
+                case SOUTH -> 180;
+                case WEST -> 270;
+            });
+
+            this.getChildren().add(playerImage);
         }
     }
 
+    /**
+     * Responds to updates from the observed Space model. Updates the view to reflect any
+     * changes in the space's state, such as a player moving onto or off of the space.
+     * @param subject The subject (Space) that has been updated.
+     */
     @Override
     public void updateView(Subject subject) {
-        if (subject == this.space) {
+        Space s = this.space;
+        if (subject == s) {
+            switch (s.getHeading()){
+                case EAST -> image.setRotate(90);
+                case WEST -> image.setRotate(-90);
+                case SOUTH -> image.setRotate(180);
+            }
+
             updatePlayer();
         }
+    }
+
+    public Phase getPhase(){
+        return space.getPhase();
     }
 
 }
