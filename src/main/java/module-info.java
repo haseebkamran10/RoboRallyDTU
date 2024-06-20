@@ -7,6 +7,12 @@ module dk.dtu.compute.se.pisd.roborally.StartRoboRall {
     requires org.jetbrains.annotations;
     requires com.google.gson;
     requires com.google.common;
+    requires spring.context;
+    requires spring.web;
+    requires spring.beans;
+    requires spring.boot.autoconfigure;
+    requires spring.boot;
+    requires static lombok;
     // requires com.google.guava;
 
     opens dk.dtu.compute.se.pisd.roborally to javafx.fxml;
