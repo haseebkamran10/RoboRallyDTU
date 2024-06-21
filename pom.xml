@@ -17,19 +17,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
-        <javafx.version>17</javafx.version>
-        <javafx.maven.plugin.version>0.0.6</javafx.maven.plugin.version>
+        <javafx.version>22</javafx.version>
+        <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
     </properties>
 
     <dependencies>
-        <!-- Note that the dependencies here include some more dependencies
-             than are necessary right now; dependencies that might need to
-             be included later in the course of the project are added
-             already now, just to avoid missing these later. This applies
-             for example to mysql, gson, guava, ...  -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -89,20 +84,9 @@
             <version>3.11.2</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
-
-
-
     <build>
-        <!-- we use default maven directory structure as indicated below
-        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/resources</directory>
-            </resource>
-        </resources> -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -163,5 +147,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
