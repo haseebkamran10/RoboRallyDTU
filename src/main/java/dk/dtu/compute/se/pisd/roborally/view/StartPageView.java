@@ -3,8 +3,11 @@ package dk.dtu.compute.se.pisd.roborally.view;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,9 @@ public class StartPageView extends Application {
 
     @Autowired
     private HostGameView hostGameView;
+
+    @Autowired
+    private JoinGameView joinGameView;
 
     @Override
     public void start(Stage primaryStage) {
@@ -44,9 +50,37 @@ public class StartPageView extends Application {
 
         Button joinHostGameButton = new Button("Join/Host Game");
         joinHostGameButton.setStyle("-fx-font-size: 16px;");
-        joinHostGameButton.setOnAction(e -> hostGameView.start(new Stage()));
+        joinHostGameButton.setOnAction(e -> showJoinHostOptions(primaryStage));
 
         root.getChildren().addAll(titleLabel, createBoardButton, createPlayerButton, joinHostGameButton);
+
+        Scene scene = new Scene(root, 400, 500);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void showJoinHostOptions(Stage primaryStage) {
+        VBox root = new VBox(20);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: #1E1E1E; -fx-padding: 30;");
+
+        Label titleLabel = new Label("Join or Host a Game");
+        titleLabel.setStyle("-fx-text-fill: white; -fx-font-size: 22px;");
+        titleLabel.setAlignment(Pos.CENTER);
+
+        Button hostGameButton = new Button("Host Game");
+        hostGameButton.setStyle("-fx-font-size: 16px;");
+        hostGameButton.setOnAction(e -> hostGameView.start(new Stage()));
+
+        Button joinGameButton = new Button("Join Game");
+        joinGameButton.setStyle("-fx-font-size: 16px;");
+        joinGameButton.setOnAction(e -> joinGameView.start(new Stage()));
+
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 16px;");
+        backButton.setOnAction(e -> start(primaryStage));
+
+        root.getChildren().addAll(titleLabel, hostGameButton, joinGameButton, backButton);
 
         Scene scene = new Scene(root, 400, 500);
         primaryStage.setScene(scene);

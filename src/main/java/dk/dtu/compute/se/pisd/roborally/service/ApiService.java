@@ -1,5 +1,7 @@
 package dk.dtu.compute.se.pisd.roborally.service;
 
+import dk.dtu.compute.se.pisd.roborally.model.GameSessionDTO;
+import dk.dtu.compute.se.pisd.roborally.model.PlayerDTO;
 import dk.dtu.compute.se.pisd.roborally.model.BoardDTO;
 import dk.dtu.compute.se.pisd.roborally.model.Player;
 import org.springframework.stereotype.Service;
@@ -27,5 +29,13 @@ public class ApiService {
 
     public List<BoardDTO> getAllBoards() {
         return Arrays.asList(restTemplate.getForObject(BASE_URL + "/boards", BoardDTO[].class));
+    }
+
+    public GameSessionDTO createGameSession(GameSessionDTO gameSessionDTO) {
+        return restTemplate.postForObject(BASE_URL + "/gamesessions/create-new-session", gameSessionDTO, GameSessionDTO.class);
+    }
+
+    public void joinGameSessionByCode(String joinCode, PlayerDTO playerDTO) {
+        restTemplate.postForObject(BASE_URL + "/gamesessions/join/" + joinCode, playerDTO, GameSessionDTO.class);
     }
 }
