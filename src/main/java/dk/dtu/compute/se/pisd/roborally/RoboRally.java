@@ -1,6 +1,7 @@
 package dk.dtu.compute.se.pisd.roborally;
 
-import dk.dtu.compute.se.pisd.roborally.view.CreatePlayerView;
+import dk.dtu.compute.se.pisd.roborally.view.LoadingScreen;
+import dk.dtu.compute.se.pisd.roborally.view.StartPageView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -21,14 +22,25 @@ public class RoboRally extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        springContext = SpringApplication.run(RoboRally.class, savedArgs);
-        CreatePlayerView view = springContext.getBean(CreatePlayerView.class);
-        view.start(primaryStage);
+        LoadingScreen loadingScreen = new LoadingScreen();
+        loadingScreen.start(primaryStage);
+
+        new Thread(() -> {
+            springContext = SpringApplication.run(RoboRally.class, savedArgs);
+            Platform.runLater(() -> {
+                StartPageView view = springContext.getBean(StartPageView.class);
+                primaryStage.close();
+                Stage newStage = new Stage();
+                view.start(newStage);
+            });
+        }).start();
     }
 
     @Override
     public void stop() {
-        springContext.close();
+        if (springContext != null) {
+            springContext.close();
+        }
         Platform.exit();
     }
 }
