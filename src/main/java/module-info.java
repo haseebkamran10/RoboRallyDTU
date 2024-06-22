@@ -12,6 +12,8 @@ module dk.dtu.compute.se.pisd.roborally.RoboRally {
     requires spring.boot;
     requires spring.core;
     requires org.slf4j;
+    requires ch.qos.logback.classic;
+    requires ch.qos.logback.core;
     requires spring.webmvc;
     requires spring.data.jpa;
     requires java.instrument;
