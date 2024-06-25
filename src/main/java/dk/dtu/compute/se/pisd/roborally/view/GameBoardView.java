@@ -1,7 +1,10 @@
 package dk.dtu.compute.se.pisd.roborally.view;
 
+import dk.dtu.compute.se.pisd.roborally.model.BoardDTO;
+import dk.dtu.compute.se.pisd.roborally.model.SpaceDTO;
 import dk.dtu.compute.se.pisd.roborally.service.ApiService;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -9,9 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,22 +35,51 @@ public class GameBoardView extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("RoboRally Game Board");
 
-        VBox root = new VBox(20);
+        VBox root = new VBox(10);  // Adjusted spacing
         root.setAlignment(Pos.CENTER);
-        root.setStyle("-fx-background-color: #1E1E1E; -fx-padding: 30;");
+        root.setStyle("-fx-background-color: #1E1E1E; -fx-padding: 10;");
+
+        // Fetch and render the board asynchronously
+        new Thread(() -> {
+            BoardDTO board = apiService.getBoardById(1); // Fetch board with ID 1
+            Platform.runLater(() -> renderBoard(root, board));
+        }).start();
+
+        Scene scene = new Scene(root, 1000, 700);  // Adjusted size
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private void renderBoard(VBox root, BoardDTO board) {
+        if (board == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the board.");
+            return;
+        }
+
+        // Load the board image
+        Image boardImage = new Image(getClass().getResourceAsStream("/boards/png/Board1.png"));
+        ImageView boardImageView = new ImageView(boardImage);
+        boardImageView.setFitWidth(600);  // Adjusted size
+        boardImageView.setFitHeight(600);  // Adjusted size
+
+        StackPane boardPane = new StackPane();
+        boardPane.getChildren().add(boardImageView);
 
         GridPane boardGrid = new GridPane();
         boardGrid.setGridLinesVisible(true);
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                Label cell = new Label();
-                cell.setMinSize(50, 50);
-                cell.setStyle("-fx-border-color: black;");
-                boardGrid.add(cell, i, j);
+
+        for (List<SpaceDTO> row : board.getSpaces()) {
+            for (SpaceDTO space : row) {
+                Region cell = new Region();
+                cell.setMinSize(40, 40);  // Adjusted cell size
+                cell.setStyle("-fx-border-color: transparent;"); // Remove border color
+                boardGrid.add(cell, space.getX(), space.getY());
             }
         }
 
-        HBox cardSelection = new HBox(10);
+        boardPane.getChildren().add(boardGrid);
+
+        HBox cardSelection = new HBox(5);  // Adjusted spacing
         cardSelection.setAlignment(Pos.CENTER);
 
         // Add cards
@@ -66,17 +96,17 @@ public class GameBoardView extends Application {
         submitButton.setStyle("-fx-font-size: 16px;");
         submitButton.setOnAction(e -> handleSubmit());
 
-        root.getChildren().addAll(boardGrid, cardSelection, submitButton);
+        VBox controls = new VBox(10);  // Adjusted spacing
+        controls.setAlignment(Pos.CENTER);
+        controls.getChildren().addAll(cardSelection, submitButton);
 
-        Scene scene = new Scene(root, 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        root.getChildren().addAll(boardPane, controls);
     }
 
     private VBox createCard(String name, String imagePath) {
         ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
-        imageView.setFitWidth(80);
-        imageView.setFitHeight(120);
+        imageView.setFitWidth(50);  // Adjusted card size
+        imageView.setFitHeight(70);  // Adjusted card size
         Label label = new Label(name);
         VBox cardBox = new VBox(imageView, label);
         cardBox.setAlignment(Pos.CENTER);
