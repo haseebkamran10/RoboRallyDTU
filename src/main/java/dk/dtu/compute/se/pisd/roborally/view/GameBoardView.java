@@ -1,6 +1,7 @@
 package dk.dtu.compute.se.pisd.roborally.view;
 
 import dk.dtu.compute.se.pisd.roborally.model.BoardDTO;
+import dk.dtu.compute.se.pisd.roborally.model.Player;
 import dk.dtu.compute.se.pisd.roborally.model.SpaceDTO;
 import dk.dtu.compute.se.pisd.roborally.service.ApiService;
 import javafx.application.Application;
@@ -35,22 +36,37 @@ public class GameBoardView extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("RoboRally Game Board");
 
-        VBox root = new VBox(10);  // Adjusted spacing
-        root.setAlignment(Pos.CENTER);
+        BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #1E1E1E; -fx-padding: 10;");
 
         // Fetch and render the board asynchronously
         new Thread(() -> {
             BoardDTO board = apiService.getBoardById(1); // Fetch board with ID 1
-            Platform.runLater(() -> renderBoard(root, board));
+            List<Player> players = fetchPlayers(); // Fetch players
+            Platform.runLater(() -> renderBoard(root, board, players));
         }).start();
 
-        Scene scene = new Scene(root, 1000, 700);  // Adjusted size
+        Scene scene = new Scene(root, 1000, 800);  // Adjusted size
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void renderBoard(VBox root, BoardDTO board) {
+    private List<Player> fetchPlayers() {
+        List<Player> players = new ArrayList<>();
+        for (int i = 1; i <= 6; i++) {
+            try {
+                Player player = apiService.getPlayerById(i);
+                if (player != null) {
+                    players.add(player);
+                }
+            } catch (Exception e) {
+                // Handle exceptions, such as player not found
+            }
+        }
+        return players;
+    }
+
+    private void renderBoard(BorderPane root, BoardDTO board, List<Player> players) {
         if (board == null) {
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the board.");
             return;
@@ -100,7 +116,37 @@ public class GameBoardView extends Application {
         controls.setAlignment(Pos.CENTER);
         controls.getChildren().addAll(cardSelection, submitButton);
 
-        root.getChildren().addAll(boardPane, controls);
+        // Add players' avatars and names
+        VBox leftPlayers = new VBox(10);
+        leftPlayers.setAlignment(Pos.CENTER);
+        VBox rightPlayers = new VBox(10);
+        rightPlayers.setAlignment(Pos.CENTER);
+
+        for (int i = 0; i < players.size(); i++) {
+            Player player = players.get(i);
+            VBox playerBox = createPlayerBox(player);
+            if (i % 2 == 0) {
+                leftPlayers.getChildren().add(playerBox);
+            } else {
+                rightPlayers.getChildren().add(playerBox);
+            }
+        }
+
+        root.setLeft(leftPlayers);
+        root.setRight(rightPlayers);
+        root.setCenter(boardPane);
+        root.setBottom(controls);
+    }
+
+    private VBox createPlayerBox(Player player) {
+        ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/avatars/" + player.getAvatar() + ".png")));
+        imageView.setFitWidth(50);
+        imageView.setFitHeight(50);
+        Label nameLabel = new Label(player.getName());
+        nameLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
+        VBox playerBox = new VBox(imageView, nameLabel);
+        playerBox.setAlignment(Pos.CENTER);
+        return playerBox;
     }
 
     private VBox createCard(String name, String imagePath) {

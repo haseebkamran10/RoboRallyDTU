@@ -67,4 +67,8 @@ public class ApiService {
         String url = BASE_URL + "/players/" + playerId + "/move?x=" + x + "&y=" + y;
         restTemplate.put(url, null);
     }
+
+    public Player getPlayerById(long playerId) {
+        return restTemplate.getForObject(BASE_URL + "/players/" + playerId, Player.class);
+    }
 }
