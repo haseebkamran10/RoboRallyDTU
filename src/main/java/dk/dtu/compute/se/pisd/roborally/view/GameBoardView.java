@@ -300,7 +300,7 @@ public class GameBoardView extends Application {
     }
 
     private void startPolling() {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(5), event -> updateGameState()));
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), event -> updateGameState()));
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
