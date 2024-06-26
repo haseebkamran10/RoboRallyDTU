@@ -68,9 +68,10 @@ public class ApiService {
     public Player getPlayerById(long playerId) {
         return restTemplate.getForObject(BASE_URL + "/players/" + playerId, Player.class);
     }
-    public List<Player> getPlayersByGameId(long gameId) {
+
+    public GameState getGameStateByGameId(long gameId) {
         String url = BASE_URL + "/gamesessions/" + gameId + "/state";
-        GameState gameState = restTemplate.getForObject(url, GameState.class);
-        return gameState.getPlayers();
+        return restTemplate.getForObject(url, GameState.class);
     }
+
 }

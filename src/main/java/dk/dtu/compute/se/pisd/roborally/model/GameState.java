@@ -1,7 +1,10 @@
 package dk.dtu.compute.se.pisd.roborally.model;
 
+import dk.dtu.compute.se.pisd.roborally.model.Player;
+
 import java.util.List;
 
+// In GameState.java
 public class GameState {
     private boolean gameStarted;
     private List<Player> players;
