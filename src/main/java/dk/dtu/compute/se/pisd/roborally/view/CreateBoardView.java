@@ -38,6 +38,10 @@ public class CreateBoardView extends Application {
     public void start(Stage primaryStage) {
         this.startPageStage = primaryStage;
 
+        Image logo = new Image(getClass().getResourceAsStream("/logo.png"));
+        primaryStage.getIcons().add(logo);
+
+
         primaryStage.setTitle("Create Board");
 
         VBox root = new VBox(20);

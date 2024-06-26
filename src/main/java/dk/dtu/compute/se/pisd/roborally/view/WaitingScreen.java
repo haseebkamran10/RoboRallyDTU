@@ -17,13 +17,12 @@ public class WaitingScreen {
 
     public void start(Stage primaryStage, long gameId) {
         primaryStage.setTitle("Waiting...");
-
+        Image logo = new Image(getClass().getResourceAsStream("/logo.png"));
+        primaryStage.getIcons().add(logo);
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #1E1E1E; -fx-padding: 30;");
 
-        // Load the logo image
-        Image logo = new Image(getClass().getResourceAsStream("/logo.png"));
         ImageView logoView = new ImageView(logo);
         logoView.setFitWidth(200);
         logoView.setFitHeight(200);

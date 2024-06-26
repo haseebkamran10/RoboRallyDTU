@@ -27,13 +27,18 @@ public class GameBoardView extends Application {
     @Autowired
     private ApiService apiService;
 
-    private long playerId;
+    private long playerId = 1; // Ensure this is properly set
     private long gameId;
 
     private List<String> selectedCards = new ArrayList<>();
+    private List<Player> players;
 
     @Override
     public void start(Stage primaryStage) {
+        Image logo = loadImage("/logo.png");
+        if (logo != null) {
+            primaryStage.getIcons().add(logo);
+        }
         primaryStage.setTitle("RoboRally Game Board");
 
         BorderPane root = new BorderPane();
@@ -42,13 +47,22 @@ public class GameBoardView extends Application {
         // Fetch and render the board asynchronously
         new Thread(() -> {
             BoardDTO board = apiService.getBoardById(1); // Fetch board with ID 1
-            List<Player> players = fetchPlayers(); // Fetch players
+            players = fetchPlayers(); // Fetch players
             Platform.runLater(() -> renderBoard(root, board, players));
         }).start();
 
-        Scene scene = new Scene(root, 1000, 800);  // Adjusted size
+        Scene scene = new Scene(root, 1000, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private Image loadImage(String path) {
+        try {
+            return new Image(getClass().getResourceAsStream(path));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private List<Player> fetchPlayers() {
@@ -73,7 +87,12 @@ public class GameBoardView extends Application {
         }
 
         // Load the board image
-        Image boardImage = new Image(getClass().getResourceAsStream("/boards/png/Board1.png"));
+        Image boardImage = loadImage("/boards/png/Board1.png");
+        if (boardImage == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the board image.");
+            return;
+        }
+
         ImageView boardImageView = new ImageView(boardImage);
         boardImageView.setFitWidth(600);  // Adjusted size
         boardImageView.setFitHeight(600);  // Adjusted size
@@ -136,10 +155,31 @@ public class GameBoardView extends Application {
         root.setRight(rightPlayers);
         root.setCenter(boardPane);
         root.setBottom(controls);
+
+        // Add movement controls
+        HBox movementControls = new HBox(10);
+        movementControls.setAlignment(Pos.CENTER);
+        Button moveUp = new Button("Up");
+        Button moveDown = new Button("Down");
+        Button moveLeft = new Button("Left");
+        Button moveRight = new Button("Right");
+
+        moveUp.setOnAction(e -> movePlayer("up"));
+        moveDown.setOnAction(e -> movePlayer("down"));
+        moveLeft.setOnAction(e -> movePlayer("left"));
+        moveRight.setOnAction(e -> movePlayer("right"));
+
+        movementControls.getChildren().addAll(moveUp, moveDown, moveLeft, moveRight);
+        controls.getChildren().add(movementControls);
     }
 
     private VBox createPlayerBox(Player player) {
-        ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream("/avatars/" + player.getAvatar() + ".png")));
+        Image playerImage = loadImage("/avatars/" + player.getAvatar() + ".png");
+        if (playerImage == null) {
+            playerImage = loadImage("/avatars/default.png"); // Fallback to a default image
+        }
+
+        ImageView imageView = new ImageView(playerImage);
         imageView.setFitWidth(50);
         imageView.setFitHeight(50);
         Label nameLabel = new Label(player.getName());
@@ -150,7 +190,7 @@ public class GameBoardView extends Application {
     }
 
     private VBox createCard(String name, String imagePath) {
-        ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream(imagePath)));
+        ImageView imageView = new ImageView(loadImage(imagePath));
         imageView.setFitWidth(50);  // Adjusted card size
         imageView.setFitHeight(70);  // Adjusted card size
         Label label = new Label(name);
@@ -169,13 +209,17 @@ public class GameBoardView extends Application {
     }
 
     private void handleSubmit() {
-        if (selectedCards.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", "No cards selected. Please select cards.");
+        Player currentPlayer = players.stream().filter(p -> p.getId() == playerId).findFirst().orElse(null);
+        if (currentPlayer == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Current player not found.");
             return;
         }
 
-        // Calculate new coordinates based on selected cards
-        int x = 0, y = 0;  // Starting coordinates
+        // Start from the current player's position
+        int x = currentPlayer.getX();
+        int y = currentPlayer.getY();
+
+        // Adjust coordinates based on selected cards
         for (String card : selectedCards) {
             switch (card) {
                 case "Fwd":
@@ -208,11 +252,57 @@ public class GameBoardView extends Application {
 
         try {
             apiService.movePlayer(playerId, x, y);
+            currentPlayer.setX(x);
+            currentPlayer.setY(y);
+            updatePlayerPosition(currentPlayer);
             showAlert(Alert.AlertType.INFORMATION, "Success", "Moves submitted successfully!");
         } catch (Exception e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to submit moves.");
         }
+    }
+
+    private void movePlayer(String direction) {
+        Player currentPlayer = players.stream().filter(p -> p.getId() == playerId).findFirst().orElse(null);
+        if (currentPlayer == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Current player not found.");
+            return;
+        }
+
+        int newX = currentPlayer.getX();
+        int newY = currentPlayer.getY();
+
+        switch (direction) {
+            case "up":
+                newY -= 1;
+                break;
+            case "down":
+                newY += 1;
+                break;
+            case "left":
+                newX -= 1;
+                break;
+            case "right":
+                newX += 1;
+                break;
+        }
+
+        try {
+            apiService.movePlayer(playerId, newX, newY);
+            currentPlayer.setX(newX);
+            currentPlayer.setY(newY);
+            updatePlayerPosition(currentPlayer);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to move player.");
+        }
+    }
+
+    private void updatePlayerPosition(Player player) {
+        // Update the player's position on the game board UI
+        // You can implement this method to reflect the changes in the player's position visually
+        System.out.println("Updated player position to (" + player.getX() + ", " + player.getY() + ")");
+        // Optionally, you could re-render the entire board or just the player's position
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {
