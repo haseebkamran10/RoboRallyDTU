@@ -19,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class GameBoardView extends Application {
@@ -32,6 +34,7 @@ public class GameBoardView extends Application {
 
     private List<String> selectedCards = new ArrayList<>();
     private List<Player> players;
+    private Map<Long, ImageView> playerImageViews = new HashMap<>(); // Map to store player ImageViews
 
     @Override
     public void start(Stage primaryStage) {
@@ -51,7 +54,7 @@ public class GameBoardView extends Application {
             Platform.runLater(() -> renderBoard(root, board, players));
         }).start();
 
-        Scene scene = new Scene(root, 1000, 800);
+        Scene scene = new Scene(root, 1200, 800); // Adjusted scene size for better visibility
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -86,29 +89,18 @@ public class GameBoardView extends Application {
             return;
         }
 
-        // Load the board image
-        Image boardImage = loadImage("/boards/png/Board1.png");
-        if (boardImage == null) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load the board image.");
-            return;
-        }
-
-        ImageView boardImageView = new ImageView(boardImage);
-        boardImageView.setFitWidth(600);  // Adjusted size
-        boardImageView.setFitHeight(600);  // Adjusted size
-
-        StackPane boardPane = new StackPane();
-        boardPane.getChildren().add(boardImageView);
-
         GridPane boardGrid = new GridPane();
         boardGrid.setGridLinesVisible(true);
+        boardGrid.setAlignment(Pos.CENTER); // Center-align the board
+        boardGrid.setStyle("-fx-padding: 20; -fx-background-color: #1E1E1E;"); // Adding padding and background color
 
-        for (List<SpaceDTO> row : board.getSpaces()) {
-            for (SpaceDTO space : row) {
+        // Create a chequered board
+        for (int i = 0; i < board.getHeight(); i++) {
+            for (int j = 0; j < board.getWidth(); j++) {
                 Region cell = new Region();
-                cell.setMinSize(40, 40);  // Adjusted cell size
-                cell.setStyle("-fx-border-color: transparent;"); // Remove border color
-                boardGrid.add(cell, space.getX(), space.getY());
+                cell.setMinSize(60, 60);  // Adjusted cell size for a larger board
+                cell.setStyle((i + j) % 2 == 0 ? "-fx-background-color: white;" : "-fx-background-color: black;"); // Chequered pattern
+                boardGrid.add(cell, j, i);
             }
         }
 
@@ -120,14 +112,18 @@ public class GameBoardView extends Application {
             }
 
             ImageView playerImageView = new ImageView(playerImage);
-            playerImageView.setFitWidth(40);  // Adjust size to fit the cell
-            playerImageView.setFitHeight(40); // Adjust size to fit the cell
+            playerImageView.setFitWidth(60);  // Adjust size to fit the cell
+            playerImageView.setFitHeight(60); // Adjust size to fit the cell
+            playerImageViews.put(player.getId(), playerImageView); // Store the ImageView in the map
 
             StackPane playerCell = new StackPane(playerImageView);
-            boardGrid.add(playerCell, player.getX(), board.getHeight() - player.getY() - 1);
+            int transformedY = board.getHeight() - player.getY() - 1;
+            if (player.getX() >= 0 && player.getX() < board.getWidth() && transformedY >= 0 && transformedY < board.getHeight()) {
+                boardGrid.add(playerCell, player.getX(), transformedY);
+            }
         }
 
-        boardPane.getChildren().add(boardGrid);
+        root.setCenter(boardGrid);
 
         HBox cardSelection = new HBox(5);  // Adjusted spacing
         cardSelection.setAlignment(Pos.CENTER);
@@ -168,24 +164,7 @@ public class GameBoardView extends Application {
 
         root.setLeft(leftPlayers);
         root.setRight(rightPlayers);
-        root.setCenter(boardPane);
         root.setBottom(controls);
-
-        // Add movement controls
-        HBox movementControls = new HBox(10);
-        movementControls.setAlignment(Pos.CENTER);
-        Button moveUp = new Button("Up");
-        Button moveDown = new Button("Down");
-        Button moveLeft = new Button("Left");
-        Button moveRight = new Button("Right");
-
-        moveUp.setOnAction(e -> movePlayer("up"));
-        moveDown.setOnAction(e -> movePlayer("down"));
-        moveLeft.setOnAction(e -> movePlayer("left"));
-        moveRight.setOnAction(e -> movePlayer("right"));
-
-        movementControls.getChildren().addAll(moveUp, moveDown, moveLeft, moveRight);
-        controls.getChildren().add(movementControls);
     }
 
     private VBox createPlayerBox(Player player) {
@@ -238,22 +217,22 @@ public class GameBoardView extends Application {
         for (String card : selectedCards) {
             switch (card) {
                 case "Fwd":
-                    y -= 1;
+                    y += 1; // Move up
                     break;
                 case "FwdX2":
-                    y -= 2;
+                    y += 2; // Move up twice
                     break;
                 case "FwdX3":
-                    y -= 3;
+                    y += 3; // Move up thrice
                     break;
                 case "BackUp":
-                    y += 1;
+                    y -= 1; // Move down
                     break;
                 case "TurnLeft":
-                    x -= 1;
+                    x -= 1; // Move left
                     break;
                 case "TurnRight":
-                    x += 1;
+                    x += 1; // Move right
                     break;
                 case "UTurn":
                     x = -x;
@@ -264,6 +243,10 @@ public class GameBoardView extends Application {
                     break;
             }
         }
+
+        // Ensure coordinates are within valid range
+        x = Math.max(0, x);
+        y = Math.max(0, y);
 
         try {
             apiService.movePlayer(playerId, x, y);
@@ -277,47 +260,25 @@ public class GameBoardView extends Application {
         }
     }
 
-    private void movePlayer(String direction) {
-        Player currentPlayer = players.stream().filter(p -> p.getId() == playerId).findFirst().orElse(null);
-        if (currentPlayer == null) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Current player not found.");
-            return;
-        }
-
-        int newX = currentPlayer.getX();
-        int newY = currentPlayer.getY();
-
-        switch (direction) {
-            case "up":
-                newY -= 1;
-                break;
-            case "down":
-                newY += 1;
-                break;
-            case "left":
-                newX -= 1;
-                break;
-            case "right":
-                newX += 1;
-                break;
-        }
-
-        try {
-            apiService.movePlayer(playerId, newX, newY);
-            currentPlayer.setX(newX);
-            currentPlayer.setY(newY);
-            updatePlayerPosition(currentPlayer);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to move player.");
-        }
-    }
-
     private void updatePlayerPosition(Player player) {
         // Update the player's position on the game board UI
-        // You can implement this method to reflect the changes in the player's position visually
+        ImageView playerImageView = playerImageViews.get(player.getId());
+        if (playerImageView != null) {
+            // Remove the player ImageView from the current cell
+            GridPane parent = (GridPane) playerImageView.getParent().getParent();
+            parent.getChildren().remove(playerImageView.getParent());
+
+            // Calculate the new cell position
+            int transformedY = parent.getRowCount() - player.getY() - 1;
+
+            // Add the player ImageView to the new cell
+            StackPane newCell = new StackPane(playerImageView);
+            if (player.getX() >= 0 && player.getX() < parent.getColumnCount() && transformedY >= 0 && transformedY < parent.getRowCount()) {
+                parent.add(newCell, player.getX(), transformedY);
+            }
+        }
+
         System.out.println("Updated player position to (" + player.getX() + ", " + player.getY() + ")");
-        // Optionally, you could re-render the entire board or just the player's position
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {
