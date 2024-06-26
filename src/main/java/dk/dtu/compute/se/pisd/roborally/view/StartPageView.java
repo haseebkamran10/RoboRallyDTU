@@ -1,17 +1,23 @@
 package dk.dtu.compute.se.pisd.roborally.view;
 
+import dk.dtu.compute.se.pisd.roborally.model.GameSessionDTO;
+import dk.dtu.compute.se.pisd.roborally.service.ApiService;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Component
 public class StartPageView extends Application {
@@ -28,8 +34,22 @@ public class StartPageView extends Application {
     @Autowired
     private JoinGameView joinGameView;
 
+    @Autowired
+    private WaitingScreen waitingScreen;
+
+    @Autowired
+    private GameBoardView gameBoardView;
+
+    @Autowired
+    private ApiService apiService;
+
+    private Stage primaryStage;
+
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        Image logo = new Image(getClass().getResourceAsStream("/logo.png"));
+        primaryStage.getIcons().add(logo);
         primaryStage.setTitle("RoboRally Web");
 
         VBox root = new VBox(20);
@@ -85,6 +105,28 @@ public class StartPageView extends Application {
         Scene scene = new Scene(root, 400, 500);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public void showWaitingScreen(Stage stage, Long gameId) {
+        waitingScreen.start(stage, gameId);
+        pollGameState(stage, gameId);
+    }
+
+    private void pollGameState(Stage stage, Long gameId) {
+        Timer timer = new Timer(true);
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    if (apiService.isGameStarted(gameId)) {
+                        timer.cancel();
+                        // Transition to GameBoardView
+                        gameBoardView.start(stage);
+                    }
+                });
+            }
+        };
+        timer.schedule(task, 0, 2000); // Poll every 2 seconds
     }
 
     public static void main(String[] args) {

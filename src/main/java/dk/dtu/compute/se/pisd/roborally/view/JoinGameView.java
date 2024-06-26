@@ -1,7 +1,9 @@
 package dk.dtu.compute.se.pisd.roborally.view;
 
+import dk.dtu.compute.se.pisd.roborally.model.GameSessionDTO;
 import dk.dtu.compute.se.pisd.roborally.model.PlayerDTO;
 import dk.dtu.compute.se.pisd.roborally.service.ApiService;
+import dk.dtu.compute.se.pisd.roborally.service.PollingService;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,6 +12,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +28,21 @@ public class JoinGameView extends Application {
     @Autowired
     private ApplicationContext context;
 
-    private Stage startPageStage;
+    @Autowired
+    private WaitingScreen waitingScreen;
+
+    @Autowired
+    private PollingService pollingService;
+
+    @Autowired
+    private GameBoardView gameBoardView;  // Add this line
 
     @Override
     public void start(Stage primaryStage) {
-        this.startPageStage = primaryStage;
-
         primaryStage.setTitle("Join Game");
+
+        Image logo = new Image(getClass().getResourceAsStream("/logo.png"));
+        primaryStage.getIcons().add(logo);
 
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
@@ -77,11 +88,20 @@ public class JoinGameView extends Application {
             PlayerDTO playerDTO = new PlayerDTO();
             playerDTO.setId(Long.parseLong(playerId));
 
-            apiService.joinGameSessionByCode(joinCode, playerDTO);
+            GameSessionDTO gameSessionDTO = apiService.joinGameSessionByCode(joinCode, playerDTO);
             showAlert(AlertType.INFORMATION, "Joined Game",
                     "Successfully joined the game!");
-            primaryStage.close();
-            startPageStage.show();
+
+            // Redirect to the waiting screen and start polling
+            waitingScreen.start(primaryStage, gameSessionDTO.getId());
+            pollingService.startPolling(gameSessionDTO.getId(), () -> {
+                try {
+                    gameBoardView.start(primaryStage);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
         } catch (NumberFormatException e) {
             showAlert(AlertType.ERROR, "Error", "Invalid input for Player ID.");
         } catch (Exception e) {
