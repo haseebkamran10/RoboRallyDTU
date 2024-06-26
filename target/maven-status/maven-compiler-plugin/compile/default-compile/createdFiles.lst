@@ -6,6 +6,7 @@ dk\dtu\compute\se\pisd\roborally\model\Board.class
 dk\dtu\compute\se\pisd\roborally\service\GameService.class
 dk\dtu\compute\se\pisd\roborally\RoboRally.class
 dk\dtu\compute\se\pisd\roborally\controller\AppController.class
+dk\dtu\compute\se\pisd\roborally\model\GameState.class
 dk\dtu\compute\se\pisd\roborally\model\GameSession.class
 dk\dtu\compute\se\pisd\roborally\model\PlayerDTO.class
 dk\dtu\compute\se\pisd\roborally\controller\GameController.class

@@ -1,9 +1,6 @@
 package dk.dtu.compute.se.pisd.roborally.service;
 
-import dk.dtu.compute.se.pisd.roborally.model.BoardDTO;
-import dk.dtu.compute.se.pisd.roborally.model.GameSessionDTO;
-import dk.dtu.compute.se.pisd.roborally.model.Player;
-import dk.dtu.compute.se.pisd.roborally.model.PlayerDTO;
+import dk.dtu.compute.se.pisd.roborally.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,5 +67,10 @@ public class ApiService {
 
     public Player getPlayerById(long playerId) {
         return restTemplate.getForObject(BASE_URL + "/players/" + playerId, Player.class);
+    }
+    public List<Player> getPlayersByGameId(long gameId) {
+        String url = BASE_URL + "/gamesessions/" + gameId + "/state";
+        GameState gameState = restTemplate.getForObject(url, GameState.class);
+        return gameState.getPlayers();
     }
 }
