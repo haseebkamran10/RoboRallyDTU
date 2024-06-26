@@ -3,6 +3,7 @@ package dk.dtu.compute.se.pisd.roborally.view;
 import dk.dtu.compute.se.pisd.roborally.model.GameSessionDTO;
 import dk.dtu.compute.se.pisd.roborally.model.PlayerDTO;
 import dk.dtu.compute.se.pisd.roborally.service.ApiService;
+import dk.dtu.compute.se.pisd.roborally.service.PollingService;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,6 +12,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +30,23 @@ public class HostGameView extends Application {
     @Autowired
     private ApplicationContext context;
 
+    @Autowired
+    private WaitingScreen waitingScreen;
+
+    @Autowired
+    private PollingService pollingService;
+
+    @Autowired
+    private GameBoardView gameBoardView;  // Add this line
+
     private Stage startPageStage;
 
     @Override
     public void start(Stage primaryStage) {
         this.startPageStage = primaryStage;
+
+        Image logo = new Image(getClass().getResourceAsStream("/logo.png"));
+        primaryStage.getIcons().add(logo);
 
         primaryStage.setTitle("Host Game");
 
@@ -101,6 +115,17 @@ public class HostGameView extends Application {
             GameSessionDTO createdGameSession = apiService.createGameSession(gameSessionDTO);
             showAlert(AlertType.INFORMATION, "Game Created",
                     "Game created successfully! Join Code: " + createdGameSession.getJoinCode(), primaryStage);
+
+            // Redirect to the waiting screen and start polling
+            waitingScreen.start(primaryStage, createdGameSession.getId());
+            pollingService.startPolling(createdGameSession.getId(), () -> {
+                try {
+                    gameBoardView.start(primaryStage);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
         } catch (NumberFormatException e) {
             showAlert(AlertType.ERROR, "Error", "Invalid input for Board ID, Max Players, or Player ID.");
         } catch (Exception e) {

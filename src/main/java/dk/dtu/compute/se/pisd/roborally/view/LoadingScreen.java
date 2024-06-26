@@ -18,6 +18,7 @@ public class LoadingScreen {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Loading...");
 
+
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #1E1E1E; -fx-padding: 30;");
