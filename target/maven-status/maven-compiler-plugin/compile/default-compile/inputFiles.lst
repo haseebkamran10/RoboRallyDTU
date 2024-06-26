@@ -9,12 +9,15 @@ C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pi
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\model\BoardDTO.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\model\GameSession.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\model\GameSessionDTO.java
+C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\model\GameState.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\model\Heading.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\model\Player.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\model\PlayerDTO.java
+C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\model\SpaceDTO.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\RoboRally.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\service\ApiService.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\service\GameService.java
+C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\service\PollingService.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\view\CreateBoardView.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\view\CreatePlayerView.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\view\GameBoardView.java
@@ -22,4 +25,5 @@ C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pi
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\view\JoinGameView.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\view\LoadingScreen.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\view\StartPageView.java
+C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\dk\dtu\compute\se\pisd\roborally\view\WaitingScreen.java
 C:\Users\hasee\Desktop\AP24\RoboRallyFrontEnd\src\main\java\module-info.java

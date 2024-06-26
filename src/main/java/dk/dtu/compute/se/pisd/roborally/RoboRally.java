@@ -4,6 +4,7 @@ import dk.dtu.compute.se.pisd.roborally.view.LoadingScreen;
 import dk.dtu.compute.se.pisd.roborally.view.StartPageView;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,6 +23,9 @@ public class RoboRally extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        Image logo = new Image(getClass().getResourceAsStream("/logo.png"));
+        primaryStage.getIcons().add(logo);
+
         LoadingScreen loadingScreen = new LoadingScreen();
         loadingScreen.start(primaryStage);
 
