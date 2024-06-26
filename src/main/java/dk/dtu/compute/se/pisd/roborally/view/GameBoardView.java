@@ -1,9 +1,12 @@
 package dk.dtu.compute.se.pisd.roborally.view;
 
 import dk.dtu.compute.se.pisd.roborally.model.BoardDTO;
+import dk.dtu.compute.se.pisd.roborally.model.GameSessionDTO;
 import dk.dtu.compute.se.pisd.roborally.model.Player;
-import dk.dtu.compute.se.pisd.roborally.model.SpaceDTO;
+import dk.dtu.compute.se.pisd.roborally.model.PlayerDTO;
 import dk.dtu.compute.se.pisd.roborally.service.ApiService;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -15,6 +18,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,11 +34,12 @@ public class GameBoardView extends Application {
     private ApiService apiService;
 
     private long playerId = 1; // Ensure this is properly set
-    private long gameId;
+    private long gameId = 1; // Ensure this is properly set
 
     private List<String> selectedCards = new ArrayList<>();
     private List<Player> players;
     private Map<Long, ImageView> playerImageViews = new HashMap<>(); // Map to store player ImageViews
+    private GridPane boardGrid;
 
     @Override
     public void start(Stage primaryStage) {
@@ -52,6 +57,7 @@ public class GameBoardView extends Application {
             BoardDTO board = apiService.getBoardById(1); // Fetch board with ID 1
             players = fetchPlayers(); // Fetch players
             Platform.runLater(() -> renderBoard(root, board, players));
+            startPolling();
         }).start();
 
         Scene scene = new Scene(root, 1200, 800); // Adjusted scene size for better visibility
@@ -89,7 +95,7 @@ public class GameBoardView extends Application {
             return;
         }
 
-        GridPane boardGrid = new GridPane();
+        boardGrid = new GridPane();
         boardGrid.setGridLinesVisible(true);
         boardGrid.setAlignment(Pos.CENTER); // Center-align the board
         boardGrid.setStyle("-fx-padding: 20; -fx-background-color: #1E1E1E;"); // Adding padding and background color
@@ -106,21 +112,7 @@ public class GameBoardView extends Application {
 
         // Place players' avatars on the board
         for (Player player : players) {
-            Image playerImage = loadImage("/avatars/" + player.getAvatar() + ".png");
-            if (playerImage == null) {
-                playerImage = loadImage("/avatars/default.png"); // Fallback to a default image
-            }
-
-            ImageView playerImageView = new ImageView(playerImage);
-            playerImageView.setFitWidth(60);  // Adjust size to fit the cell
-            playerImageView.setFitHeight(60); // Adjust size to fit the cell
-            playerImageViews.put(player.getId(), playerImageView); // Store the ImageView in the map
-
-            StackPane playerCell = new StackPane(playerImageView);
-            int transformedY = board.getHeight() - player.getY() - 1;
-            if (player.getX() >= 0 && player.getX() < board.getWidth() && transformedY >= 0 && transformedY < board.getHeight()) {
-                boardGrid.add(playerCell, player.getX(), transformedY);
-            }
+            addPlayerToBoard(board, player);
         }
 
         root.setCenter(boardGrid);
@@ -165,6 +157,24 @@ public class GameBoardView extends Application {
         root.setLeft(leftPlayers);
         root.setRight(rightPlayers);
         root.setBottom(controls);
+    }
+
+    private void addPlayerToBoard(BoardDTO board, Player player) {
+        Image playerImage = loadImage("/avatars/" + player.getAvatar() + ".png");
+        if (playerImage == null) {
+            playerImage = loadImage("/avatars/default.png"); // Fallback to a default image
+        }
+
+        ImageView playerImageView = new ImageView(playerImage);
+        playerImageView.setFitWidth(60);  // Adjust size to fit the cell
+        playerImageView.setFitHeight(60); // Adjust size to fit the cell
+        playerImageViews.put(player.getId(), playerImageView); // Store the ImageView in the map
+
+        StackPane playerCell = new StackPane(playerImageView);
+        int transformedY = board.getHeight() - player.getY() - 1;
+        if (player.getX() >= 0 && player.getX() < board.getWidth() && transformedY >= 0 && transformedY < board.getHeight()) {
+            boardGrid.add(playerCell, player.getX(), transformedY);
+        }
     }
 
     private VBox createPlayerBox(Player player) {
@@ -287,6 +297,38 @@ public class GameBoardView extends Application {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private void startPolling() {
+        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(5), event -> updateGameState()));
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+
+    private void updateGameState() {
+        Platform.runLater(() -> {
+            GameSessionDTO gameSession = apiService.getGameSessionState(gameId);
+            if (gameSession != null) {
+                List<Player> updatedPlayers = new ArrayList<>();
+                for (PlayerDTO playerDTO : gameSession.getPlayers()) {
+                    updatedPlayers.add(convertPlayerDTOToPlayer(playerDTO));
+                }
+                players = updatedPlayers;
+                for (Player player : players) {
+                    updatePlayerPosition(player);
+                }
+            }
+        });
+    }
+
+    private Player convertPlayerDTOToPlayer(PlayerDTO playerDTO) {
+        Player player = new Player();
+        player.setId(playerDTO.getId());
+        player.setName(playerDTO.getName());
+        player.setAvatar(playerDTO.getAvatar());
+        player.setX(playerDTO.getX());
+        player.setY(playerDTO.getY());
+        return player;
     }
 
     public static void main(String[] args) {

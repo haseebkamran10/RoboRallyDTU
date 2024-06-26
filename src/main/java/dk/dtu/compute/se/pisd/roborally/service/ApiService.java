@@ -51,10 +51,14 @@ public class ApiService {
         return restTemplate.postForObject(BASE_URL + "/gamesessions/join/" + joinCode, playerDTO, GameSessionDTO.class);
     }
 
+    public GameSessionDTO getGameSessionState(Long id) {
+        return restTemplate.getForObject(BASE_URL + "/gamesessions/" + id + "/state", GameSessionDTO.class);
+    }
+
+
     public GameSessionDTO getGameSessionById(Long id) {
         return restTemplate.getForObject(BASE_URL + "/gamesessions/" + id, GameSessionDTO.class);
     }
-
     public boolean isGameStarted(Long gameId) {
         GameSessionDTO gameSession = getGameSessionById(gameId);
         return gameSession != null && "true".equals(gameSession.getGameState());
